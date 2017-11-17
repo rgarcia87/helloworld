@@ -1,0 +1,94 @@
+##########################################
+# Rodrigo García-Muelas                  #
+# Created: Jan 11, 2013                  #
+# Edit 3 : Nov 17, 2017                  #
+##########################################
+
+# Input ##################################   
+# 1 # name
+# 2 # queue id
+# 3 # number of processors
+# 4 # version
+##########################################
+
+# To run in local, write on command line: mpirun -np 2 vasp                                       
+
+# tekla1, tekla2 or marenostrum ##########
+mar=0 
+case $2 in
+ 16a)  queue=class_a  ; mar=3 ; procqueue=16 ; maxhours=71 ;;
+ 16b)  queue=class_b  ; mar=3 ; procqueue=16 ; maxhours=47 ;;
+ 16c)  queue=class_c  ; mar=3 ; procqueue=16 ; maxhours=23 ;; 
+ 16d)  queue=debug    ; mar=3 ; procqueue=16 ; maxhours=00 ;; 
+ 48a)  queue=class_a  ; mar=4 ; procqueue=48 ; maxhours=71 ;;
+ 48b)  queue=class_b  ; mar=4 ; procqueue=48 ; maxhours=47 ;;
+ 48c)  queue=class_c  ; mar=4 ; procqueue=48 ; maxhours=23 ;; 
+ 48d)  queue=debug    ; mar=4 ; procqueue=48 ; maxhours=01 ;;  
+ *)    echo "Error in queue name!!! " ; exit ;;
+esac
+
+# MOD should be 0 ########################
+let AAA=`expr $3 % $procqueue`
+#echo $AAA
+if [ 0 -ne $AAA ] ; then echo "Error in number of processors" ;  exit ; fi
+##########################################
+
+# version
+
+if [ -z $4 ] ; then
+  if   [ $mar = 3 ] ; then vaspversion="vasp.complex"
+  elif [ $mar = 4 ] ; then vaspversion="vasp_std"  
+  fi 
+else vaspversion=$4 ; fi
+
+# echo $1
+# echo $2
+# echo $3
+# echo $queue
+# echo "hola"
+# echo $AAA
+# echo $tk1
+# echo $tk2
+# echo $mar
+# echo $version
+
+##########################################
+
+
+# queues of Marenostrum 3 ################
+if [ $mar = 3 ] ; then cat >run.sh<<!
+#!/bin/bash
+#BSUB -J $1
+#BSUB -q $queue 
+#BSUB -n $3 
+#BSUB -W $maxhours:59
+#BSUB -o o_$1.%J
+#BSUB -e e_$1.%J
+#BSUB -u rgarcia@iciq.es
+#BSUB -R"span[ptile=16]"
+### Load environment variables ###########
+module load VASP/5.3.3
+### Run job ##############################
+~/bin/savecalc ; mpirun $vaspversion ; rm CHG
+!
+fi
+##########################################
+
+# queues of Marenostrum 4 ################
+if [ $mar = 4 ] ; then cat >run.sh<<!
+#!/bin/bash    
+#SBATCH --qos=$queue   
+#SBATCH --time=$maxhours:59:00   
+#SBATCH --job-name=$1  
+#SBATCH --cpus-per-task=1  
+#SBATCH --tasks-per-node=48  
+#SBATCH --ntasks=$3   
+#SBATCH --output=o_$1.%j 
+#SBATCH --error=e_$1.%j 
+   
+module load vasp/5.4.4 
+srun  /apps/VASP/5.4.4/INTEL/IMPI/bin/$vaspversion  
+
+!
+fi
+##########################################
