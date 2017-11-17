@@ -25,4 +25,4 @@ About MareNostrum: https://www.bsc.es/
 * If you want to use an exotic flavour that is not yet compiled for the version you are using, you can request MareNostrum people to compile it. Ask your boss before doing the request. Otherwise, you can use an older version of VASP. Feel free to explore into these MareNostrum folders: 
  /apps/VASP/
 
-* Remember to adapt your parallelization to the machine and processors you use each time.[http://aliga.iciq.es/wiki/index.php/The_INCAR_file#Improving_Parallelisation]
+* Remember to adapt your parallelization to the machine and processors you use each time.
