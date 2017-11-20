@@ -87,7 +87,7 @@ if [ $mar = 4 ] ; then cat >run.sh<<!
 #SBATCH --error=e_$1.%j 
    
 module load vasp/5.4.4 
-srun  /apps/VASP/5.4.4/INTEL/IMPI/bin/$vaspversion  
+~/bin/savecalc ; srun  /apps/VASP/5.4.4/INTEL/IMPI/bin/$vaspversion  
 
 !
 fi
